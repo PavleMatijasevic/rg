@@ -49,7 +49,7 @@ public:
         for (int i = 0; i < 9; ++i) {
             model = glm::mat4(1.0f);
             model = glm::translate(model, glm::vec3(x, y, z));
-            model = glm::scale(model, glm::vec3(1.5f, 0.2f, 1.5f));
+            model = glm::scale(model, glm::vec3(1.5f, 0.1f, 1.5f));
             shader.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -60,7 +60,7 @@ public:
         for (int i = 0; i < 9; ++i) {
             model = glm::mat4(1.0f);
             model = glm::translate(model, glm::vec3(x, y, z));
-            model = glm::scale(model, glm::vec3(1.5f, 0.2f, 1.5f));
+            model = glm::scale(model, glm::vec3(1.5f, 0.1f, 1.5f));
             shader.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
 
