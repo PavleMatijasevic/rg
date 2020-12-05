@@ -26,7 +26,7 @@ const unsigned int SCR_WIDTH = 1200;
 const unsigned int SCR_HEIGHT = 1000;
 
 // camera
-Camera camera(glm::vec3(6.0f, 3.0f, 0.0f));
+Camera camera(glm::vec3(25.0f, 5.0f, 0.0f));
 Function function = Function();
 
 float lastX = (float)SCR_WIDTH / 2.0;
