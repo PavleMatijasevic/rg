@@ -18,8 +18,8 @@ enum Camera_Movement {
     RIGHT
 };
 
-const float YAW         = -90.0f;
-const float PITCH       =  0.0f;
+const float YAW         = 180.0f;
+const float PITCH       =  5.0f;
 const float SPEED       =  2.5f;
 const float SENSITIVITY =  0.1f;
 const float ZOOM        =  45.0f;
@@ -61,14 +61,18 @@ public:
 
     void ProcessKeyboard(Camera_Movement direction, float deltaTime) {
         float velocity = MovementSpeed * deltaTime;
-        if (direction == FORWARD)
+        if (direction == FORWARD) {
             Position += Front * velocity;
-        if (direction == BACKWARD)
+        }
+        if (direction == BACKWARD) {
             Position -= Front * velocity;
-        if (direction == LEFT)
+        }
+        if (direction == LEFT) {
             Position -= Right * velocity;
-        if (direction == RIGHT)
+        }
+        if (direction == RIGHT) {
             Position += Right * velocity;
+        }
     }
 
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true) {
