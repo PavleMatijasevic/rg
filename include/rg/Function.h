@@ -25,46 +25,53 @@ public:
                 glm::vec3(0.0f, 5.9f, -2.5f),
                 glm::vec3(-0.5f, 5.9f, -3.0f)
         };
-        for (int i = 0; i < 12; ++i) {
+        int n = 12;
+
+        for (int i = 0; i < n; ++i) {
             model = glm::mat4(1.0f);
             light_positions[i].x += 4.0f;
             model = glm::translate(model, light_positions[i]);
             model = glm::scale(model, glm::vec3(0.1f));
             lightShader.setMat4("model", model);
+
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
-        for (int i = 0; i < 12; ++i) {
+        for (int i = 0; i < n; ++i) {
             model = glm::mat4(1.0f);
             light_positions[i].x -= 8.0f;
             light_positions[i].z += 6.0f;
             model = glm::translate(model, light_positions[i]);
             model = glm::scale(model, glm::vec3(0.1f));
             lightShader.setMat4("model", model);
+
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
     }
 
     void setting_up_tiles_in_wall(Shader &shader, glm::mat4 model) {
-        float x = 6.5f, y = 6.0f, z = -5.5f;
-        for (int i = 0; i < 9; ++i) {
+        float tiles_in_wall_x_positions[] = {
+                6.5f, 4.75f, 3.0f, 1.25f, -0.5f, -2.25f, -4.0f, -5.75f, -7.5f
+        };
+        float y = 6.0f, z = -5.5f;
+        int n = 9;
+
+        for (int i = 0; i < n; ++i) {
             model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(x, y, z));
+            model = glm::translate(model, glm::vec3(tiles_in_wall_x_positions[i], y, z));
             model = glm::scale(model, glm::vec3(1.5f, 0.1f, 1.5f));
             shader.setMat4("model", model);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
 
-            x -= 1.75f;
+            glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
-        x = 6.5f, y = 6.0f, z = 5.5f;
-        for (int i = 0; i < 9; ++i) {
+        z *= -1;
+        for (int i = 0; i < n; ++i) {
             model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(x, y, z));
+            model = glm::translate(model, glm::vec3(tiles_in_wall_x_positions[i], y, z));
             model = glm::scale(model, glm::vec3(1.5f, 0.1f, 1.5f));
             shader.setMat4("model", model);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
 
-            x -= 1.75f;
+            glDrawArrays(GL_TRIANGLES, 0, 36);
         }
     }
 
@@ -72,17 +79,18 @@ public:
         // 0, -3
         // -4, 3
         float x = 4.0f, y, z = -3.0f;
+        int m = 2, n = 4;
 
-        for (int j = 0; j < 2; ++j) {
+        for (int j = 0; j < m; ++j) {
 
             y = 0.0f;
-            for (int i = 0; i < 4; ++i) {
+            for (int i = 0; i < n; ++i) {
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3(x, y, z));
                 model = glm::scale(model, glm::vec3(1.5f, 0.1f, 1.5f));
                 shader.setMat4("model", model);
-                glDrawArrays(GL_TRIANGLES, 0, 36);
 
+                glDrawArrays(GL_TRIANGLES, 0, 36);
                 y += 2.0f;
             }
             x = -4.0f;
@@ -92,7 +100,9 @@ public:
 
     void setting_up_floor(Shader &shader, glm::mat4 model, unsigned int floor) {
         float x = 0.0f, y = 0.0f, z = 0.0f;
-        for (int i = 0; i < 2; ++i) {
+        int n = 2;
+
+        for (int i = 0; i < n; ++i) {
             if (i == 1) {
                 glBindTexture(GL_TEXTURE_2D, floor);
             }
@@ -109,17 +119,18 @@ public:
         float x = 4.0f;
         float z = -3.0f;
         float y;
+        int m = 2, n = 6;
 
         glBindTexture(GL_TEXTURE_2D, wall);
 
-        for (int j = 0; j < 2; ++j) {
+        for (int j = 0; j < m; ++j) {
             y = 0.5f;
-            for (int i = 0; i < 6; ++i) {
+            for (int i = 0; i < n; ++i) {
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3(x, y, z));
                 shader.setMat4("model", model);
-                glDrawArrays(GL_TRIANGLES, 0, 36);
 
+                glDrawArrays(GL_TRIANGLES, 0, 36);
                 y += 1.0f;
             }
             x = -4.0f;
@@ -129,15 +140,16 @@ public:
 
     void setting_up_wall(Shader &shader, glm::mat4 model, unsigned int tile, unsigned int wall, float height) {
         float x, y = height, z;
+        int m = 6, n = 14, k = 11;
 
-        for (int j = 0; j < 6; ++j) {
+        for (int j = 0; j < m; ++j) {
             glBindTexture(GL_TEXTURE_2D, wall);
             if (j == 1 || j == 4) {
                 glBindTexture(GL_TEXTURE_2D, tile);
             }
 
             x = 6.5f, z = -5.5f;
-            for (int i = 0; i < 14; ++i) {
+            for (int i = 0; i < n; ++i) {
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3(x, y, z));
                 shader.setMat4("model", model);
@@ -146,7 +158,7 @@ public:
                 x -= 1.0f;
             }
 
-            for (int i = 0; i <= 10; ++i) {
+            for (int i = 0; i < k; ++i) {
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3(x, y, z));
                 shader.setMat4("model", model);
@@ -155,7 +167,7 @@ public:
                 z += 1.0f;
             }
 
-            for (int i = 0; i <= 14; ++i) {
+            for (int i = 0; i <= n; ++i) {
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3(x, y, z));
                 shader.setMat4("model", model);
