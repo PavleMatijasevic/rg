@@ -99,42 +99,46 @@ public:
     }
 
     void setting_up_floor(Shader &shader, glm::mat4 model, unsigned int floor) {
-        float x = 0.0f, y = 0.0f, z = 0.0f;
-        int n = 2;
+        glBindTexture(GL_TEXTURE_2D, floor);
 
-        for (int i = 0; i < n; ++i) {
-            if (i == 1) {
-                glBindTexture(GL_TEXTURE_2D, floor);
-            }
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(x, y, z));
-            shader.setMat4("model", model);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f));
+        shader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
-            y = 6.0f;
-        }
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(3.5f, 6.0f, 0.0f));
+        model = glm::scale(model,glm::vec3(0.5f, 1.0f, 1.0f));
+        shader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-3.5f, 6.0f, 2.0f));
+        model = glm::scale(model, glm::vec3(0.5f, 1.0f, 0.6f));
+        shader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
     void setting_up_pillar(Shader& shader, glm::mat4 model, unsigned int wall) {
-        float x = 4.0f;
-        float z = -3.0f;
-        float y;
-        int m = 2, n = 6;
+        int n = 6;
+        float y = 0.5f;
 
         glBindTexture(GL_TEXTURE_2D, wall);
+        for (int i = 0; i < n; ++i) {
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(4.0f, y, -3.0f));
+            shader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            y += 1.0f;
+        }
 
-        for (int j = 0; j < m; ++j) {
-            y = 0.5f;
-            for (int i = 0; i < n; ++i) {
-                model = glm::mat4(1.0f);
-                model = glm::translate(model, glm::vec3(x, y, z));
-                shader.setMat4("model", model);
-
-                glDrawArrays(GL_TRIANGLES, 0, 36);
-                y += 1.0f;
-            }
-            x = -4.0f;
-            z = 3.0f;
+        y = 0.5f;
+        for (int i = 0; i < n; ++i) {
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(-4.0f, y, 3.0f));
+            shader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            y += 1.0f;
         }
     }
 
