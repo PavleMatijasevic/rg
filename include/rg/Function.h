@@ -4,11 +4,22 @@
 
 #ifndef PROJECT_BASE_FUNCTION_H
 #define PROJECT_BASE_FUNCTION_H
+
+#include <learnopengl/model.h>
+
 class Function {
 public:
     Function() {};
 
-    void setting_up_light(Shader &lightShader, glm::mat4 model) {
+    void load_stairs(Model &ourModel, glm::mat4 &model, Shader &shader) {
+        model = glm::translate(model, glm::vec3(-3.0f, 0.0f, -3.0f));
+        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.03f, 0.05f, 0.02f));
+        shader.setMat4("model", model);
+        ourModel.Draw(shader);
+    }
+
+    void setting_up_light(Shader &lightShader, glm::mat4 &model) {
         glm::vec3 light_positions[] = {
                 glm::vec3(0.0f, 1.9f, -3.5f),
                 glm::vec3(0.5f, 1.9f, -3.0f),
@@ -48,7 +59,7 @@ public:
         }
     }
 
-    void setting_up_tiles_in_wall(Shader &shader, glm::mat4 model) {
+    void setting_up_tiles_in_wall(Shader &shader, glm::mat4 &model) {
         float tiles_in_wall_x_positions[] = {
                 6.5f, 4.75f, 3.0f, 1.25f, -0.5f, -2.25f, -4.0f, -5.75f, -7.5f
         };
@@ -75,7 +86,7 @@ public:
         }
     }
 
-    void setting_up_tiles_in_pillar(Shader &shader, glm::mat4 model) {
+    void setting_up_tiles_in_pillar(Shader &shader, glm::mat4 &model) {
         // 0, -3
         // -4, 3
         float x = 4.0f, y, z = -3.0f;
@@ -98,7 +109,7 @@ public:
         }
     }
 
-    void setting_up_floor(Shader &shader, glm::mat4 model, unsigned int floor) {
+    void setting_up_floor(Shader &shader, glm::mat4 &model, unsigned int floor) {
         glBindTexture(GL_TEXTURE_2D, floor);
 
         model = glm::mat4(1.0f);
@@ -119,7 +130,7 @@ public:
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
-    void setting_up_pillar(Shader& shader, glm::mat4 model, unsigned int wall) {
+    void setting_up_pillar(Shader& shader, glm::mat4 &model, unsigned int wall) {
         int n = 6;
         float y = 0.5f;
 
@@ -142,7 +153,7 @@ public:
         }
     }
 
-    void setting_up_wall(Shader &shader, glm::mat4 model, unsigned int tile, unsigned int wall, float height) {
+    void setting_up_wall(Shader &shader, glm::mat4 &model, unsigned int tile, unsigned int wall, float height) {
         float x, y = height, z;
         int m = 6, n = 14, k = 11;
 
