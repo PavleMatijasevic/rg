@@ -6,9 +6,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <stb_image.h>
-#include <assimp/include/assimp/Importer.hpp>
-#include <assimp/include/assimp/scene.h>
-#include <assimp/include/assimp/postprocess.h>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 #include <learnopengl/mesh.h>
 #include <learnopengl/shader.h>
@@ -243,4 +243,6 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
     return textureID;
 }
 #endif
+
+
 
