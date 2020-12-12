@@ -12,9 +12,9 @@ public:
     Function() {};
 
     void load_stairs(Model &ourModel, glm::mat4 &model, Shader &shader) {
-        model = glm::translate(model, glm::vec3(-3.0f, 0.0f, -3.0f));
-        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(0.03f, 0.05f, 0.02f));
+        model = glm::translate(model, glm::vec3(-4.1f, 0.0f, 2.0f));
+        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(1.0f, 1.1f, 1.0f));
         shader.setMat4("model", model);
         ourModel.Draw(shader);
     }
@@ -40,7 +40,7 @@ public:
 
         for (int i = 0; i < n; ++i) {
             model = glm::mat4(1.0f);
-            light_positions[i].x += 4.0f;
+            light_positions[i].x -= 4.0f;
             model = glm::translate(model, light_positions[i]);
             model = glm::scale(model, glm::vec3(0.1f));
             lightShader.setMat4("model", model);
@@ -49,7 +49,7 @@ public:
         }
         for (int i = 0; i < n; ++i) {
             model = glm::mat4(1.0f);
-            light_positions[i].x -= 8.0f;
+            light_positions[i].x += 8.0f;
             light_positions[i].z += 6.0f;
             model = glm::translate(model, light_positions[i]);
             model = glm::scale(model, glm::vec3(0.1f));
@@ -89,7 +89,7 @@ public:
     void setting_up_tiles_in_pillar(Shader &shader, glm::mat4 &model) {
         // 0, -3
         // -4, 3
-        float x = 4.0f, y, z = -3.0f;
+        float x = -4.0f, y, z = -3.0f;
         int m = 2, n = 4;
 
         for (int j = 0; j < m; ++j) {
@@ -104,7 +104,7 @@ public:
                 glDrawArrays(GL_TRIANGLES, 0, 36);
                 y += 2.0f;
             }
-            x = -4.0f;
+            x = 4.0f;
             z = 3.0f;
         }
     }
@@ -118,14 +118,14 @@ public:
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(3.5f, 6.0f, 0.0f));
-        model = glm::scale(model,glm::vec3(0.5f, 1.0f, 1.0f));
+        model = glm::translate(model, glm::vec3(2.8f, 6.0f, 0.0f));
+        model = glm::scale(model,glm::vec3(0.6f, 1.0f, 1.0f));
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-3.5f, 6.0f, 2.0f));
-        model = glm::scale(model, glm::vec3(0.5f, 1.0f, 0.6f));
+        model = glm::translate(model, glm::vec3(-4.2f, 6.0f, -1.25f));
+        model = glm::scale(model, glm::vec3(0.4f, 1.0f, 0.75f));
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
@@ -137,7 +137,7 @@ public:
         glBindTexture(GL_TEXTURE_2D, wall);
         for (int i = 0; i < n; ++i) {
             model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(4.0f, y, -3.0f));
+            model = glm::translate(model, glm::vec3(-4.0f, y, -3.0f));
             shader.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
             y += 1.0f;
@@ -146,7 +146,7 @@ public:
         y = 0.5f;
         for (int i = 0; i < n; ++i) {
             model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(-4.0f, y, 3.0f));
+            model = glm::translate(model, glm::vec3(4.0f, y, 3.0f));
             shader.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
             y += 1.0f;
@@ -197,3 +197,4 @@ public:
 };
 
 #endif //PROJECT_BASE_FUNCTION_H
+
