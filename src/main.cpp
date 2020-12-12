@@ -228,13 +228,10 @@ int main() {
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
 
-        // stairs
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-3.0f, 0.0f, -3.0f));
-        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(0.03f, 0.05f, 0.02f));
-        shader.setMat4("model", model);
-        ourModel.Draw(shader);
+
+        // stairs
+        function.load_stairs(ourModel, model, shader);
 
         // floor
         glBindVertexArray(floorVAO);
@@ -367,4 +364,6 @@ unsigned int loadTexture(char const *path) {
 
     return textureID;
 }
+
+
 
