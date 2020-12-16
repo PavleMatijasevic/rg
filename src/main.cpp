@@ -83,7 +83,7 @@ int main() {
                   FileSystem::getPath("resources/shaders/fragmentShader.fs").c_str());
     Shader lightShader(FileSystem::getPath("resources/shaders/lightCube.vs").c_str(),
                        FileSystem::getPath("resources/shaders/lightCube.fs").c_str());
-    Model ourModel(FileSystem::getPath("resources/objects/STAIRS/Stairs.obj").c_str());
+    Model ourModel(FileSystem::getPath("resources/objects/stairs/stairs.obj").c_str());
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -364,6 +364,14 @@ unsigned int loadTexture(char const *path) {
 
     return textureID;
 }
+
+
+
+
+
+
+
+
 
 
 
