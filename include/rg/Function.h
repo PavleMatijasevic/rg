@@ -11,19 +11,19 @@ class Function {
 public:
     Function() {};
 
-    void load_stairs(Model &ourModel, glm::mat4 &model, Shader &shader) {
+    void load_stairs(Model &stairs_model, glm::mat4 &model, Shader &shader) {
         model = glm::translate(model, glm::vec3(-4.1f, -0.5f, 2.0f));
         model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 1.0f, 0.0f));
         model = glm::scale(model, glm::vec3(1.0f, 1.2f, 1.0f));
         shader.setMat4("model", model);
-        ourModel.Draw(shader);
+        stairs_model.Draw(shader);
     }
 
-    void load_sofa(Model &ourModel, glm::mat4 &model, Shader &shader) {
-        model = glm::translate(model, glm::vec3(2.0f, 0.01f, -3.8f));
+    void load_sofa(Model &sofa_model, glm::mat4 &model, Shader &shader) {
+        model = glm::translate(model, glm::vec3(2.0f, 0.01f, -3.7f));
         model = glm::scale(model, glm::vec3(0.0015f, 0.002f, 0.002f));
         shader.setMat4("model", model);
-        ourModel.Draw(shader);
+        sofa_model.Draw(shader);
     }
 
     void setting_up_light(Shader &lightShader, glm::mat4 &model) {
@@ -204,4 +204,6 @@ public:
 };
 
 #endif //PROJECT_BASE_FUNCTION_H
+
+
 
