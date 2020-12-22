@@ -1,0 +1,63 @@
+Inteaktivna 3D grafika-> Svi objekti su u 3D svetu. Šta će biti prikazano menja se u zavisnosti od ulaza korisnika.
+
+Renderovanje-> Formiranje 2D slike iz matematičkih modela objekata.
+
+Render-loop-> Sve što program mora da uradi da bi prikazao jedan frejm.
+
+FPS (Frames-Per-Second)-> Koliko puta program u sekundi prolazi kroz ceo render loop. 
+
+Monitor refresh rate-> Koliko puta u sekundi je monitor u stanju da osveži sve piksele.
+
+GPU (Graphics Processing Unit) -> Hardver specijalizovan za operacije potrebne za renderovanje.
+
+Frustum-> Prostor koji zahvata vidno polje kamere.
+
+Z-buffer-> Struktura podataka oblika 2D niza koja čuva koliko je udaljen objekat čiji se piksel nalazi na poziciji (i,j).
+
+API-> Application Programming Interface. Skup funkcija i struktura podataka kojima programi ili delovi programa međusobno komuniciraju.
+
+OpenGL-> Specifikacija API za renderovanje vektorske grafike.
+
+OpenGL Core Profile-> Nova verzija OpenGL API sa većom fleksibilnošću i kontrolom nad izvršavanjem.
+
+OpenGL Ekstenzije-> Omogućavaju korišćenje novijih metoda koje nisu još zvanično dospele u specifikaciju, ali ih implementira neki od vendora.
+
+OpenGL State-Machine -> OpenGL je automat. Radi tako što se pozivima funkcija postave stanja i kada se izda naredba za renderovanje OpenGL koristi 
+postavljena stanja da uradi to renderovanje.
+
+OpenGL Object -> Objekti OpenGL su kolekcije opcija koje predstavljaju podskup OpenGL stanja.
+GLFW -> OpenGL biblioteka za multiplatform kreiranje prozora, konteksta, obradu korisničkog ulaza preko ulazno-izlaznih uređaja i događaja.
+
+GLAD -> Biblioteka za konfigurpsanje adresa funkcija OpenGL API-a.
+
+NDC (Normalized Device Coordinates) -> Opseg koordinata [-1.0, 1.0] po X, Y i Z osi koje OpenGL prikazuje.
+
+Shader -> Program koji se izvršava na grafičkoj kartici.
+
+GLSL -> Programski jezik sličan C jeziku za pisanje Shader-a u OpenGL-u.
+
+Vertex -> Skup atributa koji definišu jedno teme geometrijske primitive koja se crta. Ti atributi mogu biti: koordinate u prostoru, normale, boja, mapa teskture...
+
+Atribut -> Skup vrednosti koji određuje neku osobinu Vertex-a.
+
+Fragment -> Sve što je potrebno da bi se izračunala boja jednog piksela.
+
+Vertex shader -> Obrađuje tačno jedan vertex. Transformiše 3D koordinate objekta u 3D NDC koordinate.
+
+Shape assemby -> Konstruiše geometrijsku primitivu koja se crta spajajući odgovarajuća temena ili ne ako je zadatko da se crtaju tačke.
+
+Geometry shader -> Konstruiše novu geometrijsku primitivu od postojeće dodavanjem temena.
+
+Rasterization -> Mapiranje geometrijske primitive na 2D piksele.
+
+Fragment shader -> Izračunava boju piksela. 
+
+Test and blending -> Proverava dubinu i providnost piksela.
+
+Clipping -> Odsecanje svega što nije vidljivo kamerom.
+
+Vertex Buffer Object (VBO) -> Bafer objekat koji alocira memoriju na GPU i čuva sve Vertex podatke graifčkoj kartici za crtanje.
+
+Vertex Array Object (VAO) -> Čuva pokazivač na bafer i informacije o redosledu i veličini atributa.
+
+Element Buffer Object (EBO) -> Bafer objekat koji čuva indekse na grafičkoj kartici za indeksirano crtanje.
