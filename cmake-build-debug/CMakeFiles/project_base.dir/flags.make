@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_FLAGS = -Wall -Wextra -g   -std=gnu++14
 
-CXX_DEFINES = 
+CXX_DEFINES = -DIMGUI_IMPL_OPENGL_LOADER_GLAD
 
-CXX_INCLUDES = -I/home/pavle/Desktop/Projekat/cmake-build-debug/configuration -I/home/pavle/Desktop/Projekat/include -I/home/pavle/Desktop/Projekat/libs/glad/include 
+CXX_INCLUDES = -I/home/pavle/Desktop/gitb/rg/cmake-build-debug/configuration -I/home/pavle/Desktop/gitb/rg/include -I/home/pavle/Desktop/gitb/rg/libs/glad/include -I/home/pavle/Desktop/gitb/rg/libs/imgui/include 
 

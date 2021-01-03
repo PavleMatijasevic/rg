@@ -6,5 +6,5 @@ CXX_FLAGS = -Wall -Wextra -g   -std=gnu++14
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/pavle/Desktop/Projekat/cmake-build-debug/configuration -I/home/pavle/Desktop/Projekat/include 
+CXX_INCLUDES = -I/home/pavle/Desktop/gitb/rg/cmake-build-debug/configuration -I/home/pavle/Desktop/gitb/rg/include 
 

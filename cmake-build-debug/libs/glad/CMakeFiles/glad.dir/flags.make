@@ -6,5 +6,5 @@ C_FLAGS = -g
 
 C_DEFINES = 
 
-C_INCLUDES = -I/home/pavle/Desktop/Projekat/libs/glad/include 
+C_INCLUDES = -I/home/pavle/Desktop/gitb/rg/libs/glad/include 
 

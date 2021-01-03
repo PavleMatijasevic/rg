@@ -166,7 +166,7 @@ int main() {
     Model tableModel(FileSystem::getPath("resources/objects/table/wood.table.obj").c_str());
     Model deskModel(FileSystem::getPath("resources/objects/desk/CoffeeTable1.obj").c_str());
     Model tvModel(FileSystem::getPath("resources/objects/tv/TV set N140418.obj").c_str());
-    // Model bedModel(FileSystem::getPath("resources/objects/bed/Bed actual design apriori S N230720.obj").c_str());
+     Model bedModel(FileSystem::getPath("resources/objects/bed/Bed actual design apriori S N230720.obj").c_str());
     Model lockerModel(FileSystem::getPath("resources/objects/locker/Locker 1.obj").c_str());
     Model bedsideTableModel(FileSystem::getPath("resources/objects/bedside_table/Locker 2.obj").c_str());
     Model elevatorModel(FileSystem::getPath("resources/objects/elevator/untitled.obj").c_str());
@@ -435,10 +435,10 @@ int main() {
         function.loadTv(tvModel, model, shader);
 
         // bed
-        // shader.setMat4("view", view);
-        // shader.setMat4("projection", projection);
-        // model = glm::mat4(1.0f);
-        // function.loadBed(bedModel, model, shader);
+         shader.setMat4("view", view);
+         shader.setMat4("projection", projection);
+         model = glm::mat4(1.0f);
+         function.loadBed(bedModel, model, shader);
 
         // locker
         shader.setMat4("view", view);

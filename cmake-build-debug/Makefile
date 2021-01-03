@@ -68,10 +68,10 @@ RM = /home/pavle/Desktop/fax/rg/CLion-2020.2.4/clion-2020.2.4/bin/cmake/linux/bi
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/pavle/Desktop/Projekat
+CMAKE_SOURCE_DIR = /home/pavle/Desktop/gitb/rg
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/pavle/Desktop/Projekat/cmake-build-debug
+CMAKE_BINARY_DIR = /home/pavle/Desktop/gitb/rg/cmake-build-debug
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -100,9 +100,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/pavle/Desktop/Projekat/cmake-build-debug/CMakeFiles /home/pavle/Desktop/Projekat/cmake-build-debug/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pavle/Desktop/gitb/rg/cmake-build-debug/CMakeFiles /home/pavle/Desktop/gitb/rg/cmake-build-debug/CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/pavle/Desktop/Projekat/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pavle/Desktop/gitb/rg/cmake-build-debug/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -169,6 +169,19 @@ glad/fast:
 	$(MAKE) $(MAKESILENT) -f libs/glad/CMakeFiles/glad.dir/build.make libs/glad/CMakeFiles/glad.dir/build
 .PHONY : glad/fast
 
+#=============================================================================
+# Target rules for targets named imgui
+
+# Build rule for target.
+imgui: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 imgui
+.PHONY : imgui
+
+# fast build rule for target.
+imgui/fast:
+	$(MAKE) $(MAKESILENT) -f libs/imgui/CMakeFiles/imgui.dir/build.make libs/imgui/CMakeFiles/imgui.dir/build
+.PHONY : imgui/fast
+
 libs/stb_image.o: libs/stb_image.cpp.o
 
 .PHONY : libs/stb_image.o
@@ -233,6 +246,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... STB_IMAGE"
 	@echo "... glad"
+	@echo "... imgui"
 	@echo "... project_base"
 	@echo "... libs/stb_image.o"
 	@echo "... libs/stb_image.i"
