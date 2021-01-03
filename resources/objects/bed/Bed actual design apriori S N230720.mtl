@@ -1,0 +1,72 @@
+# 3ds Max Wavefront OBJ Exporter v0.94b - (c)2007 guruware
+# File Created: 22.07.2020 09:28:16
+
+newmtl fabric
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 1.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.0000 0.0000 0.0000
+	Kd 0.8941 0.7843 0.8784
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka yel_bil2.jpg
+	map_Kd yel_bil2.jpg
+
+newmtl st_textile
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 1.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.0000 0.0000 0.0000
+	Kd 0.8275 0.7529 0.5333
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka white_bi.jpg
+	map_Kd white_bi.jpg
+
+newmtl st_silk
+	Ns 70.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 1.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.0000 0.0000 0.0000
+	Kd 0.8353 0.5059 0.6157
+	Ks 0.6300 0.6300 0.6300
+	Ke 0.0000 0.0000 0.0000
+	map_Ka Tkan_pBR.jpg
+	map_Kd Tkan_pBR.jpg
+
+newmtl black_st
+	Ns 70.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 1.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.0000 0.0000 0.0000
+	Kd 0.3098 0.3098 0.3098
+	Ks 0.6300 0.6300 0.6300
+	Ke 0.0000 0.0000 0.0000
+	map_Ka metalbla.jpg
+	map_Kd metalbla.jpg
+
+newmtl st_leather
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 1.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.0000 0.0000 0.0000
+	Kd 0.8157 0.9059 0.7686
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka leat wht.jpg
+	map_Kd leat wht.jpg
