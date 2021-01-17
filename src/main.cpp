@@ -28,7 +28,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 unsigned int loadCubemap(vector<std::string> &faces);
 
 // settings
-const unsigned int SCR_WIDTH = 1000;
+const unsigned int SCR_WIDTH = 1200;
 const unsigned int SCR_HEIGHT = 1000;
 
 float lastX = (float)SCR_WIDTH / 2.0;
@@ -43,8 +43,10 @@ Function function = Function();
 
 // ProgramState
 struct ProgramState {
+    float kernel = 0.01f;
     bool ImGuiEnabled = false;
     bool open = false;
+    bool effect = false;
     float speed = 0.01f;
     int start = -1;
     Camera camera;
@@ -52,6 +54,7 @@ struct ProgramState {
     : camera(glm::vec3(25.0f, 5.0f, 0.0f)) {}
     glm::vec3 elevatorPosition = glm::vec3(-9.8f, -6.0f, 7.6f);
     glm::vec3 doorPosition = glm::vec3(-4.8f, 2.32f, -3.28f);
+    glm::mat4 view;
 
     void SaveToDisk(std::string path);
     void LoadFromDisk(std::string path);
@@ -160,13 +163,19 @@ int main() {
                         FileSystem::getPath("resources/shaders/skybox.fs").c_str());
     Shader shaderCubeMaps(FileSystem::getPath("resources/shaders/cubemaps.vs").c_str(),
                           FileSystem::getPath("resources/shaders/cubemaps.fs").c_str());
+    Shader screenShader(FileSystem::getPath("resources/shaders/framebuffer.vs").c_str(),
+                        FileSystem::getPath("resources/shaders/framebuffer.fs").c_str());
+    Shader screenShaderNext(FileSystem::getPath("resources/shaders/framebuffer.vs").c_str(),
+                            FileSystem::getPath("resources/shaders/framebufferEffect.fs").c_str());
+    Shader lightingShader(FileSystem::getPath("resources/shaders/multi_lights.vs").c_str(),
+                          FileSystem::getPath("resources/shaders/multi_lights.fs").c_str());
     Model sofaModel(FileSystem::getPath("resources/objects/sofa/sofa2.obj").c_str());
     Model chairModel(FileSystem::getPath("resources/objects/chair/Wooden Chair.obj").c_str());
     Model stairsModel(FileSystem::getPath("resources/objects/stairs/staircase_180_long.obj").c_str());
     Model tableModel(FileSystem::getPath("resources/objects/table/wood.table.obj").c_str());
     Model deskModel(FileSystem::getPath("resources/objects/desk/CoffeeTable1.obj").c_str());
     Model tvModel(FileSystem::getPath("resources/objects/tv/TV set N140418.obj").c_str());
-     Model bedModel(FileSystem::getPath("resources/objects/bed/Bed actual design apriori S N230720.obj").c_str());
+    Model bedModel(FileSystem::getPath("resources/objects/bed/Bed actual design apriori S N230720.obj").c_str());
     Model lockerModel(FileSystem::getPath("resources/objects/locker/Locker 1.obj").c_str());
     Model bedsideTableModel(FileSystem::getPath("resources/objects/bedside_table/Locker 2.obj").c_str());
     Model elevatorModel(FileSystem::getPath("resources/objects/elevator/untitled.obj").c_str());
@@ -271,6 +280,50 @@ int main() {
             1.0f, -1.0f,  1.0f
     };
 
+    float quadVertices[] = {
+            // positions   // texCoords
+            -1.0f,  1.0f,  0.0f, 1.0f,
+            -1.0f, -1.0f,  0.0f, 0.0f,
+            1.0f, -1.0f,  1.0f, 0.0f,
+
+            -1.0f,  1.0f,  0.0f, 1.0f,
+            1.0f, -1.0f,  1.0f, 0.0f,
+            1.0f,  1.0f,  1.0f, 1.0f
+    };
+
+    glm::vec3 pointLightPositions[] = {
+            glm::vec3(0.0f, 1.9f, 3.6f),
+            glm::vec3(0.4f, 1.9f, 4.0f),
+            glm::vec3(0.0f, 1.9f, 4.4f),
+            glm::vec3(-0.4f, 1.9f, 4.0f),
+            // glm::vec3(-5.5f, 4.55f, -2.65f),
+
+            glm::vec3(0.0f, 3.9f, 3.6f),
+            glm::vec3(0.4f, 3.9f, 4.0f),
+            glm::vec3(0.0f, 3.9f, 4.4f),
+            glm::vec3(-0.4f, 3.9f, 4.0f),
+
+            glm::vec3(0.0f, 5.9f, 3.6f),
+            glm::vec3(0.4f, 5.9f, 4.0f),
+            glm::vec3(0.0f, 5.9f, 4.4f),
+            glm::vec3(-0.4f, 5.9f, 4.0f),
+
+            glm::vec3(4.0f, 1.9f, 3.6f),
+            glm::vec3(4.4f, 1.9f, 4.0f),
+            glm::vec3(4.0f, 1.9f, 4.4f),
+            glm::vec3(-4.4f, 1.9f, 4.0f),
+
+            glm::vec3(4.0f, 3.9f, 3.6f),
+            glm::vec3(4.4f, 3.9f, 4.0f),
+            glm::vec3(4.0f, 3.9f, 4.4f),
+            glm::vec3(-4.4f, 3.9f, 4.0f),
+
+            glm::vec3(4.0f, 5.9f, 3.6f),
+            glm::vec3(4.4f, 5.9f, 4.0f),
+            glm::vec3(4.0f, 5.9f, 4.4f),
+            glm::vec3(-4.4f, 5.9f, 4.0f)
+    };
+
     // cube VAO
     unsigned int cubeVAO, cubeVBO;
 
@@ -332,6 +385,20 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    // screen quad VAO
+    unsigned int quadVAO, quadVBO;
+    glGenVertexArrays(1, &quadVAO);
+    glGenBuffers(1, &quadVBO);
+    glBindVertexArray(quadVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
     // load textures
     // -------------
     unsigned int wall = loadTexture(FileSystem::getPath("resources/textures/wall.jpg").c_str());
@@ -363,6 +430,66 @@ int main() {
     shaderCubeMaps.use();
     shader.setInt("skybox", 0);
 
+    screenShader.use();
+    screenShader.setInt("screenTexture", 0);
+    // screenShader.setFloat("zoom", programState->zoom);
+
+    screenShaderNext.use();
+    screenShaderNext.setInt("screenTexture", 0);
+
+    lightingShader.use();
+    lightingShader.setInt("material.diffuse", 0);
+    lightingShader.setInt("material.specular", 1);
+
+    // create framebuffer object
+    unsigned int fbo;
+    glGenFramebuffers(1, &fbo);
+
+    // activate framebuffer object
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+    // create a color attachment texture
+    unsigned int textureColorBuffer;
+    // create
+    glGenTextures(1, &textureColorBuffer);
+    // activate
+    glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
+    // texture in which we render whole picture
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // attach texture attachment to the framebuffer
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
+
+    // glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT, 0,
+    //              GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+    // -> ovako se ne radi (kao teksture) zbog perfomansi, nema konverzije, samo se vrsi upis u memoriju
+    // koriste se samo u fazi depth i blending
+    // tri bafera za boju, dubinu (24 byte) i stencil buffer (8 byte)
+
+    // create a render buffer object for depth and stencil attachment
+    unsigned int rbo;
+    // create
+    glGenRenderbuffers(1, &rbo);
+    // activate
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    // setup render buffer as depth and stencil buffer
+    // use a single renderbuffer object for both a depth and stencil buffer
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT);
+    // attachment
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+    // checking
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
+        std::cout << "OKAY!\n";
+    }
+    // da bi smo renderovali ponovo na ekran gasi se frejmbafer
+    // turn of the framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    // using second fragment shader in some moment
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window)) {
@@ -378,87 +505,237 @@ int main() {
 
         // render
         // ------
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        // check this function
+        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+        glEnable(GL_DEPTH_TEST);
 
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+        // BEGIN DRAW SCENE
         shader.use();
 
-        // camera
-        glm::mat4 view = programState->camera.GetViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(programState->camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        lightingShader.use();
+        lightingShader.setVec3("viewPos", programState->camera.Position);
+        lightingShader.setFloat("material.shininess", 32.0f);
 
+        lightingShader.setVec3("dirLight.direction", -0.2f, -1.0f, -1.0f);
+        lightingShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+        lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+        lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+
+        lightingShader.setVec3("pointLights[0].position", pointLightPositions[0]);
+        lightingShader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+        lightingShader.setVec3("pointLights[0].diffuse", 0.5f, 0.5f, 0.5f);
+        lightingShader.setVec3("pointLights[0].specular", 0.8f, 0.8f, 0.8f);
+        lightingShader.setFloat("pointLights[0].constant", 1.0f);
+        lightingShader.setFloat("pointLights[0].linear", 0.09);
+        lightingShader.setFloat("pointLights[0].quadratic", 0.032);
+
+        lightingShader.setVec3("pointLights[1].position", pointLightPositions[1]);
+        lightingShader.setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+        lightingShader.setVec3("pointLights[1].diffuse", 0.5f, 0.5f, 0.5f);
+        lightingShader.setVec3("pointLights[1].specular", 0.8f, 0.8f, 0.8f);
+        lightingShader.setFloat("pointLights[1].constant", 1.0f);
+        lightingShader.setFloat("pointLights[1].linear", 0.09);
+        lightingShader.setFloat("pointLights[1].quadratic", 0.032);
+
+        lightingShader.setVec3("pointLights[2].position", pointLightPositions[2]);
+        lightingShader.setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
+        lightingShader.setVec3("pointLights[2].diffuse", 0.5f, 0.5f, 0.5f);
+        lightingShader.setVec3("pointLights[2].specular", 0.8f, 0.8f, 0.8f);
+        lightingShader.setFloat("pointLights[2].constant", 1.0f);
+        lightingShader.setFloat("pointLights[2].linear", 0.09);
+        lightingShader.setFloat("pointLights[2].quadratic", 0.032);
+
+        lightingShader.setVec3("pointLights[3].position", pointLightPositions[3]);
+        lightingShader.setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
+        lightingShader.setVec3("pointLights[3].diffuse", 0.5f, 0.5f, 0.5f);
+        lightingShader.setVec3("pointLights[3].specular", 0.8f, 0.8f, 0.8f);
+        lightingShader.setFloat("pointLights[3].constant", 1.0f);
+        lightingShader.setFloat("pointLights[3].linear", 0.09);
+        lightingShader.setFloat("pointLights[3].quadratic", 0.032);
+
+//        lightingShader.setVec3("pointLights[4].position", pointLightPositions[4]);
+//        lightingShader.setVec3("pointLights[4].ambient", 0.05f, 0.05f, 0.05f);
+//        lightingShader.setVec3("pointLights[4].diffuse", 0.5f, 0.5f, 0.5f);
+//        lightingShader.setVec3("pointLights[4].specular", 0.8f, 0.8f, 0.8f);
+//        lightingShader.setFloat("pointLights[4].constant", 1.0f);
+//        lightingShader.setFloat("pointLights[4].linear", 0.09);
+//        lightingShader.setFloat("pointLights[4].quadratic", 0.032);
+//
+//        lightingShader.setVec3("pointLights[5].position", pointLightPositions[5]);
+//        lightingShader.setVec3("pointLights[5].ambient", 0.05f, 0.05f, 0.05f);
+//        lightingShader.setVec3("pointLights[5].diffuse", 0.5f, 0.5f, 0.5f);
+//        lightingShader.setVec3("pointLights[5].specular", 0.8f, 0.8f, 0.8f);
+//        lightingShader.setFloat("pointLights[5].constant", 1.0f);
+//        lightingShader.setFloat("pointLights[5].linear", 0.09);
+//        lightingShader.setFloat("pointLights[5].quadratic", 0.032);
+//
+//        lightingShader.setVec3("pointLights[6].position", pointLightPositions[6]);
+//        lightingShader.setVec3("pointLights[6].ambient", 0.05f, 0.05f, 0.05f);
+//        lightingShader.setVec3("pointLights[6].diffuse", 0.5f, 0.5f, 0.5f);
+//        lightingShader.setVec3("pointLights[6].specular", 0.8f, 0.8f, 0.8f);
+//        lightingShader.setFloat("pointLights[6].constant", 1.0f);
+//        lightingShader.setFloat("pointLights[6].linear", 0.09);
+//        lightingShader.setFloat("pointLights[6].quadratic", 0.032);
+//
+//        lightingShader.setVec3("pointLights[7].position", pointLightPositions[7]);
+//        lightingShader.setVec3("pointLights[7].ambient", 0.05f, 0.05f, 0.05f);
+//        lightingShader.setVec3("pointLights[7].diffuse", 0.5f, 0.5f, 0.5f);
+//        lightingShader.setVec3("pointLights[7].specular", 0.8f, 0.8f, 0.8f);
+//        lightingShader.setFloat("pointLights[7].constant", 1.0f);
+//        lightingShader.setFloat("pointLights[7].linear", 0.09);
+//        lightingShader.setFloat("pointLights[7].quadratic", 0.032);
+//
+//        lightingShader.setVec3("pointLights[8].position", pointLightPositions[8]);
+//        lightingShader.setVec3("pointLights[8].ambient", 0.05f, 0.05f, 0.05f);
+//        lightingShader.setVec3("pointLights[8].diffuse", 0.5f, 0.5f, 0.5f);
+//        lightingShader.setVec3("pointLights[8].specular", 0.8f, 0.8f, 0.8f);
+//        lightingShader.setFloat("pointLights[8].constant", 1.0f);
+//        lightingShader.setFloat("pointLights[8].linear", 0.09);
+//        lightingShader.setFloat("pointLights[8].quadratic", 0.032);
+//
+//        lightingShader.setVec3("pointLights[9].position", pointLightPositions[9]);
+//        lightingShader.setVec3("pointLights[9].ambient", 0.05f, 0.05f, 0.05f);
+//        lightingShader.setVec3("pointLights[9].diffuse", 0.5f, 0.5f, 0.5f);
+//        lightingShader.setVec3("pointLights[9].specular", 0.8f, 0.8f, 0.8f);
+//        lightingShader.setFloat("pointLights[9].constant", 1.0f);
+//        lightingShader.setFloat("pointLights[9].linear", 0.09);
+//        lightingShader.setFloat("pointLights[9].quadratic", 0.032);
+//
+//        lightingShader.setVec3("pointLights[10].position", pointLightPositions[10]);
+//        lightingShader.setVec3("pointLights[10].ambient", 0.05f, 0.05f, 0.05f);
+//        lightingShader.setVec3("pointLights[10].diffuse", 0.5f, 0.5f, 0.5f);
+//        lightingShader.setVec3("pointLights[10].specular", 0.8f, 0.8f, 0.8f);
+//        lightingShader.setFloat("pointLights[10].constant", 1.0f);
+//        lightingShader.setFloat("pointLights[10].linear", 0.09);
+//        lightingShader.setFloat("pointLights[10].quadratic", 0.032);
+//
+//        lightingShader.setVec3("pointLights[11].position", pointLightPositions[11]);
+//        lightingShader.setVec3("pointLights[11].ambient", 0.05f, 0.05f, 0.05f);
+//        lightingShader.setVec3("pointLights[11].diffuse", 0.5f, 0.5f, 0.5f);
+//        lightingShader.setVec3("pointLights[11].specular", 0.8f, 0.8f, 0.8f);
+//        lightingShader.setFloat("pointLights[11].constant", 1.0f);
+//        lightingShader.setFloat("pointLights[11].linear", 0.09);
+//        lightingShader.setFloat("pointLights[11].quadratic", 0.032);
+//
+//        lightingShader.setVec3("pointLights[12].position", pointLightPositions[12]);
+//        lightingShader.setVec3("pointLights[12].ambient", 0.05f, 0.05f, 0.05f);
+//        lightingShader.setVec3("pointLights[12].diffuse", 0.5f, 0.5f, 0.5f);
+//        lightingShader.setVec3("pointLights[12].specular", 0.8f, 0.8f, 0.8f);
+//        lightingShader.setFloat("pointLights[12].constant", 1.0f);
+//        lightingShader.setFloat("pointLights[12].linear", 0.09);
+//        lightingShader.setFloat("pointLights[12].quadratic", 0.032);
+//
+//        lightingShader.setVec3("pointLights[13].position", pointLightPositions[13]);
+//        lightingShader.setVec3("pointLights[13].ambient", 0.05f, 0.05f, 0.05f);
+//        lightingShader.setVec3("pointLights[13].diffuse", 0.5f, 0.5f, 0.5f);
+//        lightingShader.setVec3("pointLights[13].specular", 0.8f, 0.8f, 0.8f);
+//        lightingShader.setFloat("pointLights[13].constant", 1.0f);
+//        lightingShader.setFloat("pointLights[13].linear", 0.09);
+//        lightingShader.setFloat("pointLights[13].quadratic", 0.032);
+//
+//        lightingShader.setVec3("pointLights[14].position", pointLightPositions[14]);
+//        lightingShader.setVec3("pointLights[14].ambient", 0.05f, 0.05f, 0.05f);
+//        lightingShader.setVec3("pointLights[14].diffuse", 0.5f, 0.5f, 0.5f);
+//        lightingShader.setVec3("pointLights[14].specular", 0.8f, 0.8f, 0.8f);
+//        lightingShader.setFloat("pointLights[14].constant", 1.0f);
+//        lightingShader.setFloat("pointLights[14].linear", 0.09);
+//        lightingShader.setFloat("pointLights[14].quadratic", 0.032);
+
+//        lightingShader.setVec3("spotLight.position", programState->camera.Position);
+//        lightingShader.setVec3("spotLight.direction", programState->camera.Front);
+//        lightingShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+//        lightingShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
+//        lightingShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+//        lightingShader.setFloat("spotLight.constant", 1.0f);
+//        lightingShader.setFloat("spotLight.linear", 0.09);
+//        lightingShader.setFloat("spotLight.quadratic", 0.032);
+//        lightingShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+//        lightingShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+
+        // camera
+        programState->view = programState->camera.GetViewMatrix();
+        glm::mat4 projection = glm::perspective(glm::radians(programState->camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 model = glm::mat4(1.0f);
+
+        lightingShader.setMat4("projection", projection);
+        lightingShader.setMat4("view", programState->view);
+        lightingShader.setMat4("model", model);
+
         // sofa
-        shader.setMat4("view", view);
+        shader.setMat4("view", programState->view);
         shader.setMat4("projection", projection);
         model = glm::mat4(1.0f);
         function.loadSofa(sofaModel, model, shader);
 
         // chairs
-        shader.setMat4("view", view);
+        shader.setMat4("view", programState->view);
         shader.setMat4("projection", projection);
         model = glm::mat4(1.0f);
         function.loadFirstChair(chairModel, model, shader);
 
-        shader.setMat4("view", view);
+        shader.setMat4("view", programState->view);
         shader.setMat4("projection", projection);
         model = glm::mat4(1.0f);
         function.loadSecondChair(chairModel, model, shader);
 
-        shader.setMat4("view", view);
+        shader.setMat4("view", programState->view);
         shader.setMat4("projection", projection);
         model = glm::mat4(1.0f);
         function.loadThirdChair(chairModel, model, shader);
 
         // table
-        shader.setMat4("view", view);
+        shader.setMat4("view", programState->view);
         shader.setMat4("projection", projection);
         model = glm::mat4(1.0f);
         function.loadTable(tableModel, model, shader);
 
         // stairs
-        shader.setMat4("view", view);
+        shader.setMat4("view", programState->view);
         shader.setMat4("projection", projection);
         model = glm::mat4(1.0f);
         function.loadStairs(stairsModel, model, shader);
 
         // desk
-        shader.setMat4("view", view);
+        shader.setMat4("view", programState->view);
         shader.setMat4("projection", projection);
         model = glm::mat4(1.0f);
         function.loadDesk(deskModel, model, shader);
 
         // tv
-        shader.setMat4("view", view);
+        shader.setMat4("view", programState->view);
         shader.setMat4("projection", projection);
         model = glm::mat4(1.0f);
         function.loadTv(tvModel, model, shader);
 
         // bed
-         shader.setMat4("view", view);
-         shader.setMat4("projection", projection);
-         model = glm::mat4(1.0f);
-         function.loadBed(bedModel, model, shader);
+        shader.setMat4("view", programState->view);
+        shader.setMat4("projection", projection);
+        model = glm::mat4(1.0f);
+        function.loadBed(bedModel, model, shader);
 
         // locker
-        shader.setMat4("view", view);
+        shader.setMat4("view", programState->view);
         shader.setMat4("projection", projection);
         model = glm::mat4(1.0f);
         function.loadLocker(lockerModel, model, shader);
 
         // bedside_tables
-        shader.setMat4("view", view);
+        shader.setMat4("view", programState->view);
         shader.setMat4("projection", projection);
         model = glm::mat4(1.0f);
         function.loadFirstBedsideTable(bedsideTableModel, model, shader);
 
-        shader.setMat4("view", view);
+        shader.setMat4("view", programState->view);
         shader.setMat4("projection", projection);
         model = glm::mat4(1.0f);
         function.loadSecondBedsideTable(bedsideTableModel, model, shader);
 
         // elevator
-        shader.setMat4("view", view);
+        shader.setMat4("view", programState->view);
         shader.setMat4("projection", projection);
         model = glm::mat4(1.0f);
         function.loadElevator(elevatorModel, model, shader, programState->elevatorPosition, programState->speed * deltaTime, programState->start);
@@ -498,7 +775,7 @@ int main() {
         // light
         lightShader.use();
         lightShader.setMat4("projection", projection);
-        lightShader.setMat4("view", view);
+        lightShader.setMat4("view", programState->view);
         glBindVertexArray(lightVAO);
         function.settingUpLight(lightShader, model);
         glBindVertexArray(0);
@@ -509,9 +786,9 @@ int main() {
 
         // window
         shaderCubeMaps.use();
-        view = programState->camera.GetViewMatrix();
+        programState->view = programState->camera.GetViewMatrix();
         projection = glm::perspective(glm::radians(programState->camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        shaderCubeMaps.setMat4("view", view);
+        shaderCubeMaps.setMat4("view", programState->view);
         shaderCubeMaps.setMat4("projection", projection);
         shaderCubeMaps.setVec3("cameraPos", programState->camera.Position);
 
@@ -528,7 +805,7 @@ int main() {
         glDepthMask(GL_FALSE);
         glDepthFunc(GL_LEQUAL);
         skyboxShader.use();
-        skyboxShader.setMat4("view", glm::mat4(glm::mat3(view)));
+        skyboxShader.setMat4("view", glm::mat4(glm::mat3(programState->view)));
         skyboxShader.setMat4("projection", projection);
 
         glBindVertexArray(skyboxVAO);
@@ -538,6 +815,45 @@ int main() {
         glBindVertexArray(0);
         glDepthMask(GL_TRUE);
         glDepthFunc(GL_LESS);
+
+        // kernel effects
+        if (programState->effect) {
+            programState->kernel = 0.01f;
+            screenShaderNext.use();
+        }
+        else if (!programState->effect) {
+            programState->kernel = programState->kernel + 0.01f >= 1.0f ? 1.0f : programState->kernel + 0.01f;
+            screenShader.use();
+            screenShader.setFloat("kernel", programState->kernel);
+        }
+
+        // camera movement
+        if (programState->start == 1) {
+            programState->view = glm::translate(programState->view, glm::vec3(programState->camera.Position.x,
+                                                                              programState->camera.Position.y = programState->camera.Position.y + ((float)glfwGetTime() * deltaTime * programState->speed) - (-9.81 / 2.0f) *  deltaTime * programState->speed *  deltaTime * programState->speed >= 8.32f ?
+                                                                                                                8.32f : programState->camera.Position.y + ((float)glfwGetTime() * deltaTime * programState->speed) - (-9.81 / 2.0f) * deltaTime * programState->speed * deltaTime * programState->speed,
+                                                                              programState->camera.Position.z));
+        }
+        else if (programState->start == 0) {
+            programState->view = glm::translate(programState->view, glm::vec3(programState->camera.Position.x,
+                                                                              programState->camera.Position.y = programState->camera.Position.y - ((float)glfwGetTime() * deltaTime * programState->speed) - (-9.81 / 2.0f) *  deltaTime * programState->speed *  deltaTime * programState->speed <= 2.0f ?
+                                                                                                                2.0f : programState->camera.Position.y - ((float)glfwGetTime() * deltaTime * programState->speed) - (-9.81 / 2.0f) * deltaTime * programState->speed * deltaTime * programState->speed,
+                                                                              programState->camera.Position.z));
+        }
+        // END DRAW SCENE
+
+        // unbind framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // disable depth test
+        glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+        // clear all relevant buffers
+        // glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // map on screen : bottom left -> top right
+        glBindVertexArray(quadVAO);
+        glBindTexture(GL_TEXTURE_2D, textureColorBuffer);	// use the color attachment texture as the texture of the quad plane
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -560,14 +876,17 @@ int main() {
     glDeleteVertexArrays(1, &floorVAO);
     glDeleteVertexArrays(1, &lightVAO);
     glDeleteVertexArrays(1, &skyboxVAO);
+    glDeleteVertexArrays(1, &quadVAO);
     glDeleteBuffers(1, &cubeVBO);
     glDeleteBuffers(1, &floorVBO);
     glDeleteBuffers(1, &skyboxVBO);
+    glDeleteBuffers(1, &quadVBO);
 
     glfwTerminate();
 
     return 0;
 }
+
 void ElevatorImGui(ProgramState* programState) {
     // ImGui Frame init
     static bool entry = false;
@@ -584,7 +903,9 @@ void ElevatorImGui(ProgramState* programState) {
         ImGui::Checkbox("Otvori", &programState->open);
 //        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
 //
-//        if (ImGui::Button("Button"))
+//        if (ImGui::Button("Change effect")) {
+//            programState->effect = !programState->effect;
+//        }
 //            counter++;
 //        ImGui::SameLine();
 //        ImGui::Text("counter = %d", counter);
@@ -611,6 +932,7 @@ void ElevatorImGui(ProgramState* programState) {
             ImGui::Text("\nSpratovi: ");
             if (ImGui::RadioButton("Prvi sprat", &op, 1)) {
                 if (programState->camera.Position.y < 6.0) {
+                    // programState->camera = Camera(glm::vec3(programState->camera.Position.x, 8.0f, programState->camera.Position.z));
                     programState->start = 1;
                 } else {
                     op = -1;
@@ -618,6 +940,7 @@ void ElevatorImGui(ProgramState* programState) {
             }
             if (ImGui::RadioButton("Prizemlje", &op, 0)) {
                 if (programState->camera.Position.y >= 6.0f) {
+                    // programState->camera = Camera(glm::vec3(programState->camera.Position.x, 2.0f, programState->camera.Position.z));
                     programState->start = 0;
                 } else {
                     op = -1;
@@ -643,6 +966,10 @@ void ElevatorImGui(ProgramState* programState) {
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+   if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+       programState->effect = false;
+   }
+
     bool retVal = function.validPosition(programState->camera.Position.x, programState->camera.Position.y, programState->camera.Position.z);
     if (retVal) {
         if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
@@ -710,6 +1037,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     programState->camera.ProcessMouseScroll(yoffset);
+    programState->effect = true;
 }
 
 unsigned int loadCubemap(vector<std::string> &faces) {
