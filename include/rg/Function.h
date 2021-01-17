@@ -20,7 +20,7 @@ public:
     }
 
     bool validPosition(float x, float y, float z) {
-        if ((x <= -2.0f && x >= -5.0) && (z <= -2.5f && z >= -4.0f) && (y > 1.0f)) {
+        if ((x <= -1.5f && x >= -5.0f) && (z <= -2.0f && z >= -4.5f) && (y > 1.0f && y < 9.0f)) {
             return true;
         }
 
@@ -161,7 +161,7 @@ public:
     }
 
     void loadSofa(Model &sofaModel, glm::mat4 &model, Shader &shader) {
-        model = glm::translate(model, glm::vec3(2.0f, 0.0f, -3.3f));
+        model = glm::translate(model, glm::vec3(2.0f, -0.01f, -3.3f));
         model = glm::scale(model, glm::vec3(1.0f));
         shader.setMat4("model", model);
         sofaModel.Draw(shader);
@@ -203,6 +203,13 @@ public:
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+
+//        model = glm::mat4(1.0f);
+//        model = glm::translate(model, glm::vec3(-5.5f, 4.55f, -2.65f));
+//        model = glm::scale(model, glm::vec3(0.1f));
+//        lightShader.setMat4("model", model);
+//
+//        glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
     void settingUpRoof(Shader &shader, glm::mat4 &model) {
