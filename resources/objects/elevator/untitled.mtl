@@ -21,7 +21,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd silver.jpg
+map_Kd white.jpg
 
 newmtl Material_#11
 Ns 225.000000
@@ -65,7 +65,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd silver.jpg
+map_Kd tile.png
 
 newmtl Zerkelo
 Ns 225.000000
