@@ -484,7 +484,7 @@ int main() {
         std::cout << "OKAY!\n";
     }
     // da bi smo renderovali ponovo na ekran gasi se frejmbafer
-    // turn of the framebuffer
+    // turn off the framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -845,14 +845,14 @@ int main() {
         // unbind framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         // disable depth test
-        glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+        glDisable(GL_DEPTH_TEST); 
         // clear all relevant buffers
-        // glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+        // glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
         glClear(GL_COLOR_BUFFER_BIT);
 
         // map on screen : bottom left -> top right
         glBindVertexArray(quadVAO);
-        glBindTexture(GL_TEXTURE_2D, textureColorBuffer);	// use the color attachment texture as the texture of the quad plane
+        glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
